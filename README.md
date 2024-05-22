@@ -56,4 +56,50 @@ To approximate $f^*$ numerically, we generated $X_{test}$ by sampling
 approximately $10^4$ points $x \in R^d$ from a $d$-dimensional standard normal 
 distribution $N(0, I_d)$. 
 
+## Sampling in the gradient space from a desired distribution.
+
+Since our goal is to approximate $f^*(y)$, in some cases, it might be beneficial to train the model on samples $\{y_i\}$ that have some desired distribution $\nu$. For example, $\nu$ can be a uniform distribution on some compact subset $K$ of $D$. However, if we sample $d$-dimensional $x$ uniformly, then the gradient $\nabla f(x)$ will (generally) not have a $d$-dimensional uniform distribution. 
+The desired $x$-sample can be obtained as $\{(\nabla f)^{-1}(z)\}$, where $(\nabla f)^{-1}(z)$ is some element from the preimage, and $z$ is sampled according to $\nu$ on $K$. 
+In some cases, the inverse mapping $(\nabla f)^{-1}$ exists and can be found analytically; however, generally, we have to rely on approximations.
+
+To address this problem, we introduce the concept which we call \textit{the approximate inverse mapping}\footnote{We believe this unsupervised learning approach might be useful across various disciplines where computing inverse mappings is required.}. The idea is as follows:
+Let $\Psi:\mathbb{R}^d \to \mathbb{R}^d$ be some mapping. We can learn an "autoencoder type" architecture 
+$$
+x \xrightarrow{\mathfrak{e}} \Psi(x) \xrightarrow{\mathfrak{d}} x,
+$$
+where the encoder $\mathfrak{e}$ is set equal to $\Psi$. The decoder part, $\mathfrak{d}: \psi \mapsto x$, will provide an approximate inverse to the mapping $\Psi$ if $\Psi$ is invertible, and an element from the preimage otherwise. As a result, one can sample from the distribution $\nu$ in the $\{\psi\}$ space so that $\mathfrak{d}(\psi)$ generates $\{x\}$-sample, which will (approximately) have the desired property.
+
+
+
+
+## Some examples:
+
+
+* Quadratic
+$f(x) = \frac12 x^T P x +b^Tx+c$, where $P$ is a positive semi-definite matrix, $x\in \mathbb{R}^n.$ Then conjugate is
+
+$$f^*(y) = \frac12(y-b)^TP^{-1}(y-b) - c$$
+(if $P$ is positive-definite, otherwise use pseudoinverse $P^\dagger = (AA^T)^{-1}A $).
+
+
+
+* Quadratic over linear
+$f(x, y) =  x^T P x/y$, where $(x, y)\in \mathbb{R}^n\times \mathbb{R}_{++}$
+
+
+--not known
+
+
+
+* Negative logarithm
+
+$f(x) = -\sum\limits_{i=1}^n \log(x_i)$
+
+$$f^*(y) = - \sum\limits_{i=1}^n\log(-y_i) -n$$
+
+* Negative entropy
+$f(x) = \sum_i x_i\log(x_i), x\in \mathbb{R}^n_+$
+
+$f^*(y) = \sum\limits_{i=1}^ne^{y_i}-1$
+
 Libraries: JAX.
