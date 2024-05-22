@@ -23,11 +23,11 @@ where $u$ is the (concave) utility function and $c$ stands for the consumption b
 
 Since function $f$ is assumed convex, there are two possible **direct** approaches:
 
-1. Calculate FOCs (generally, subradients) of $f$ + solve corresponding equations
+1. Calculate FOCs (generally, subgradients) of $f$ + solve corresponding equations
 
 2. Realize maximization procedure directly: use stochastic gradient descent to evaluate $f_C^*(y)$.
 
-These approaches are inefficient. 
+These approaches could be more efficient. 
 
 
 **Idea 3.** In the special case, where $f \colon C \to R$ is a differentiable convex function 
@@ -62,7 +62,7 @@ Since our goal is to approximate $f^*(y)$, in some cases, it might be beneficial
 The desired $x$-sample can be obtained as $\{(\nabla f)^{-1}(z)\}$, where $(\nabla f)^{-1}(z)$ is some element from the preimage, and $z$ is sampled according to $\nu$ on $K$. 
 In some cases, the inverse mapping $(\nabla f)^{-1}$ exists and can be found analytically; however, generally, we have to rely on approximations.
 
-To address this problem, we introduce the concept which we call \textit{the approximate inverse mapping}\footnote{We believe this unsupervised learning approach might be useful across various disciplines where computing inverse mappings is required.}. The idea is as follows:
+To address this problem, we introduce the concept called \textit{the approximate inverse mapping}\footnote{We believe this unsupervised learning approach might be useful across various disciplines where computing inverse mappings is required.}. The idea is as follows:
 Let $\Psi:\mathbb{R}^d \to \mathbb{R}^d$ be some mapping. We can learn an "autoencoder type" architecture 
 $$
 x \xrightarrow{\mathfrak{e}} \Psi(x) \xrightarrow{\mathfrak{d}} x,
