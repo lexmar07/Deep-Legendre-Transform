@@ -30,7 +30,7 @@ Since function $f$ is assumed convex, there are two possible **direct** approach
 These approaches are inefficient. 
 
 
-**Idea 3.** In the special case, where $f \colon C \to \R$ is a differentiable convex function 
+**Idea 3.** In the special case, where $f \colon C \to R$ is a differentiable convex function 
 on an open convex set $C \subseteq R^d$, one has  
 $$
 f^*(y) = \langle(\nabla f)^{-1}(y), y\rangle  - f((\nabla f)^{-1}(y)) 
