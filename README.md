@@ -73,7 +73,7 @@ $\min_{\theta} \mathbb{E}_{X\sim \mu}  [ g^{\theta}  (\nabla f(X)) + f(X) - \lan
 
 or empirically,
 
-$ \min_{\theta}\ \frac{1}{n}\sum_{i=1}^{n} \left[ g^\theta(\nabla f(x_i)) + f(x_i) - \langle x_i,\nabla f(x_i)\rangle \right]^2 $
+$\min_{\theta}\frac{1}{n}\sum_{i=1}^{n} \left[ g^\theta(\nabla f(x_i)) + f(x_i) - \langle x_i,\nabla f(x_i)\rangle \right]^2$
 
 **Sampling in gradient space.** When $\nabla f$ *distorts* $C$ heavily, you can sample directly on $D$ (uniform, Gaussian, localized, etc.) and map back to $C$ with an approximate inverse $\Psi_{\theta} \approx (\nabla f)^{-1}$; see [Approximate Inverse Sampling](#approximate-inverse-sampling).
 
@@ -86,16 +86,6 @@ $ \min_{\theta}\ \frac{1}{n}\sum_{i=1}^{n} \left[ g^\theta(\nabla f(x_i)) + f(x_
 When $Y=\nabla f(X)$ with $X\sim\mu$ is highly concentrated or poorly covers $D$, training on $Y$ may be imbalanced. **Approximate inverse sampling** fixes this by learning a map
 $h_\varphi : D \to C \quad\text{with}\quad \nabla f\big(h_\varphi(y)\big) \approx y,$
 so we can first sample $Y\sim \nu^\dagger$ (a *desired* distribution on $D$: uniform, Gaussian, stratified, etc.), set $X=h_\varphi(Y)$, and then train DLT on $(Y,X)$.
-
-**Objective.** Fit $h_\varphi$ with the inverse‑consistency loss
-$\mathcal{L}_{\text{inv}}(\varphi)
-= \mathbb{E}_{Y\sim \nu^\dagger}
-\left|
-\nabla f\big(h_\varphi(Y)\big) - Y
-\right|_2^2
-+ \lambda_{\text{C}}\ \mathbb{E}\left[\mathrm{barrier}_C\big(h_\varphi(Y)\big)\right]$
-where:
-
 
 **Using $\Psi_{\theta}$ in DLT.**
 
