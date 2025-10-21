@@ -38,26 +38,6 @@ cd Deep-Legendre-Transform
 pip install -r requirements.txt
 ```
 
-## 📊 Performance Highlights
-
-| Dimension | Classical (Lucet) | DLT (ResNet) | Speedup |
-|-----------|------------------|--------------|---------|
-| 5 | 2.07 s | 0.018 s | 115× |
-| 10 | 35 min | 0.032 s | 65,625× |
-| 50 | Infeasible | 0.38 s | - |
-| 100 | Infeasible | 0.64 s | - |
-
-## 🎯 Applications
-
-### Hamilton–Jacobi PDEs
-Time-Parameterized DLT solves Hamilton–Jacobi equations via the Hopf formula: u(x,t) = (g* + tH)*(x)
-
-### Test Functions Benchmarked
-
-1. **Quadratic**: f(x) = ½Σx²ᵢ with f*(y) = ½Σy²ᵢ
-2. **Negative Log**: f(x) = -Σlog(xᵢ) with f*(y) = -d - Σlog(-yᵢ)
-3. **Negative Entropy**: f(x) = Σxᵢlog(xᵢ) with f*(y) = Σexp(yᵢ-1)
-
 ## 📝 Citation
 ```bibtex
 @inproceedings{minabutdinov2025deep,
