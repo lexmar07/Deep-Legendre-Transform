@@ -5,7 +5,7 @@
 [![NeurIPS 2025](https://img.shields.io/badge/NeurIPS-2025-purple.svg)](https://neurips.cc/)
 
 > **A simple, scalable way to learn convex conjugates in high dimensions.**
-> DLT trains a neural network to approximate the convex conjugate (f^*) of a differentiable convex function (f), using an *implicit Fenchel identity* that supplies exact training targets—no closed‑form (f^*) required.
+> DLT trains a neural network to approximate the convex conjugate \(f^*\) of a differentiable convex function \(f\), using an *implicit Fenchel identity* that supplies exact training targets—no closed‑form \(f^*\) required.
 
 ---
 
@@ -30,17 +30,17 @@
 ## Overview
 
 **Deep Legendre Transform (DLT)** is a learning framework for computing convex conjugates in high dimension.
-Classic grid methods for (f^*(y) = \sup_{x\in C}{\langle x,y\rangle - f(x)}) suffer from the curse of dimensionality; smoothing methods still require costly integration loops. DLT avoids both by training on **exact targets** derived from the *implicit* Legendre–Fenchel identity:
-[
+Classic grid methods for \(f^*(y) = \sup_{x\in C}{\langle x,y\rangle - f(x)}\) suffer from the curse of dimensionality; smoothing methods still require costly integration loops. DLT avoids both by training on **exact targets** derived from the *implicit* Legendre–Fenchel identity:
+\[
 f^*(\nabla f(x)) = \langle x, \nabla f(x)\rangle - f(x).
-]
+\]
 
 **Highlights**
 
 * **Scales to high‑D:** Works with MLPs/ResNets/ICNNs/KANs; demonstrated up to (d=200).
-* **Convex outputs (optional):** Use an ICNN to guarantee convexity of the learned (g_\theta \approx f^*).
+* **Convex outputs (optional):** Use an ICNN to guarantee convexity of the learned \(g_\theta \approx f^*\).
 * **No closed‑form dual needed:** Targets come from (f) and (\nabla f) only.
-* **Built‑in validation:** An *unbiased* Monte‑Carlo estimator certifies (L^2) approximation error of (g_\theta) to (f^*).
+* **Built‑in validation:** An *unbiased* Monte‑Carlo estimator certifies \(L^2\) approximation error of \(g_\theta\) to \(f^*\).
 * **Symbolic recovery:** With KANs, DLT can rediscover exact closed‑form conjugates in low dimension.
 
 ---
@@ -48,21 +48,21 @@ f^*(\nabla f(x)) = \langle x, \nabla f(x)\rangle - f(x).
 ## Mathematical Primer
 
 * **Legendre–Fenchel transform:**
-  [
+  \[
   f^*(y) = \sup_{x\in C} {\langle x,y\rangle - f(x)},\quad y\in\mathbb{R}^d.
-  ]
+  \]
 * **Legendre (gradient) form (on (D=\nabla f(C))):**
-  [
+  \[
   f^*(y)= \langle (\nabla f)^{-1}(y),, y\rangle - f\big((\nabla f)^{-1}(y)\big).
-  ]
-* **Implicit Fenchel identity (training key):**
-  [
+  \]
+* **Implicit Fenchel identity:**
+  \[
   f^*(\nabla f(x)) = \langle x, \nabla f(x)\rangle - f(x),\quad x\in C.
-  ]
+  \]
 
 ---
 
-## Method (DLT) in One Look
+## Method (DLT) 
 
 Train a network (g_\theta: D\to\mathbb{R}) (e.g., MLP/ResNet/ICNN/KAN) by minimizing:
 [
@@ -70,9 +70,9 @@ Train a network (g_\theta: D\to\mathbb{R}) (e.g., MLP/ResNet/ICNN/KAN) by minimi
 \big[g*\theta(\nabla f(x)) + f(x) - \langle x,\nabla f(x)\rangle\big]^2.
 ]
 
-**Sampling in gradient space.** When (\nabla f) *distorts* (C) heavily, learn a lightweight inverse (h_\vartheta) of (\nabla f) to sample desired distributions directly on (D) (uniform, Gaussian, localized, etc.), then map back (y\mapsto x=h_\vartheta(y)) for training.
+**Sampling in gradient space.** When \(\nabla f\) *distorts* \(C\) heavily, learn a lightweight inverse \(\Psi_\vartheta\) of \(\nabla f\) to sample desired distributions directly on (D) (uniform, Gaussian, localized, etc.), then map back (y\mapsto x=h_\vartheta(y)) for training.
 
-**Convexity.** Choose (g_\theta) as an **ICNN** to ensure the learned (g_\theta) is convex (helpful for downstream optimization/OT/control).
+**Convexity.** Choose \(g_\theta\) as an **ICNN** to ensure the learned \(g_\theta\) is convex (helpful for downstream optimization/OT/control).
 
 ---
 
@@ -218,23 +218,7 @@ This project is licensed under the **Apache License 2.0**. See [LICENSE](LICENSE
 
 Swiss National Science Foundation — Grant No. **10003723**
 
----
 
-## FAQ
-
-**Q1. Why do we report an error estimate without knowing a closed‑form (f^*)?**
-Because training targets come from the identity \(f^*(\nabla f(x)) = \langle x,\nabla f(x)\rangle - f(x)\), which implies 
- $\frac{1}{N} \sum_{x \in X} \brak{g(\nabla f(x)) + f(x) - \ang{x, \nabla f(x)}}^2= \frac{1}{N} \sum_{x \in X} \brak{g(\nabla f(x)) - f^*(\nabla f(x))}^2$
-gives a certificate $\int_D \brak{g(y) - f^*(y)}^2 \nu(dy) = \n{g - f^*}^2_{L^2(D, \nu)}$.
-
-**Q2. How do I get convex outputs?**
-Use an **ICNN** for (g_\theta). ICNNs guarantee convexity in their inputs and approximate convex functions arbitrarily well on compacts.
-
-**Q3. What if (\nabla f) distorts sampling on (D)?**
-Learn an approximate inverse (\Psi_\vartheta \approx (\nabla f)^{-1}) and sample on (D) directly (uniform/Gaussian/targeted), then map back to (C) for training.
-
-**Q4. Can DLT solve Hamilton–Jacobi equations?**
-Yes—via the Hopf representation (u(x,t)=(g^*+tH)^*(x)). A time‑conditioned DLT approximates ((g^*+tH)^*) and often attains lower (L^2) errors than residual‑based PINNs.
 
 
 
