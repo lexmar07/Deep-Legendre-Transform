@@ -73,7 +73,7 @@ $\min_{\theta} \mathbb{E}_{X\sim \mu}  [ g^{\theta}  (\nabla f(X)) + f(X) - \lan
 
 or empirically,
 
-$ \min_{\theta}\ \frac{1}{n}\sum_{i=1}^{n} \left[ g^\theta(\nabla f(x_i)) + f(x_i) - \langle x_i,\nabla f(x_i)\rangle \right]^2$
+$ \min_{\theta}\ \frac{1}{n}\sum_{i=1}^{n} \left[ g^\theta(\nabla f(x_i)) + f(x_i) - \langle x_i,\nabla f(x_i)\rangle \right]^2 $
 
 **Sampling in gradient space.** When $\nabla f$ *distorts* $C$ heavily, you can sample directly on $D$ (uniform, Gaussian, localized, etc.) and map back to $C$ with an approximate inverse $\Psi_{\theta} \approx (\nabla f)^{-1}$; see [Approximate Inverse Sampling](#approximate-inverse-sampling).
 
@@ -84,24 +84,18 @@ $ \min_{\theta}\ \frac{1}{n}\sum_{i=1}^{n} \left[ g^\theta(\nabla f(x_i)) + f(x_
 ## Approximate Inverse Sampling
 
 When $Y=\nabla f(X)$ with $X\sim\mu$ is highly concentrated or poorly covers $D$, training on $Y$ may be imbalanced. **Approximate inverse sampling** fixes this by learning a map
-$$h_\varphi : D \to C \quad\text{with}\quad \nabla f\big(h_\varphi(y)\big) \approx y,$$
+$h_\varphi : D \to C \quad\text{with}\quad \nabla f\big(h_\varphi(y)\big) \approx y,$
 so we can first sample $Y\sim \nu^\dagger$ (a *desired* distribution on $D$: uniform, Gaussian, stratified, etc.), set $X=h_\varphi(Y)$, and then train DLT on $(Y,X)$.
 
 **Objective.** Fit $h_\varphi$ with the inverse‑consistency loss
-$
-\mathcal{L}_{\text{inv}}(\varphi)
+$\mathcal{L}_{\text{inv}}(\varphi)
 = \mathbb{E}_{Y\sim \nu^\dagger}
 \left|
 \nabla f\big(h_\varphi(Y)\big) - Y
 \right|_2^2
-+ \lambda_{\text{C}}\ \mathbb{E}\left[\mathrm{barrier}_C\big(h_\varphi(Y)\big)\right]
-+ \lambda_{\text{Lip}}\ \mathrm{penalty}_{\text{Lip}}(h_\varphi)
-$
++ \lambda_{\text{C}}\ \mathbb{E}\left[\mathrm{barrier}_C\big(h_\varphi(Y)\big)\right]$
 where:
 
-- **Barrier / range constraint.** Penalize leaving $C$ (e.g., softplus of signed distance or box barriers).
-- **Lipschitz / monotonicity control.** Spectral normalization, gradient penalty, or contractive regularization for stability.
-  If $f$ is $m$‑strongly convex, then $(\nabla f)^{-1}$ is $1/m$‑Lipschitz; use this to set a target Lipschitz bound.
 
 **Using $\Psi_{\theta}$ in DLT.**
 
@@ -140,10 +134,8 @@ for step in range(T_dlt):
 ## Certificates: A‑Posteriori Error Estimator
 
 Let $X_1,\dots,X_n$ be i.i.d. from a distribution $\mu$ on $C$, with $\nu = \mu\circ(\nabla f)^{-1}$ on $D$. Then
-$
-\frac{1}{n}\sum_{i=1}^{n} \left[ g(\nabla f(X_i)) + f(X_i) - \langle X_i,\nabla f(X_i)\rangle \right]^2 \xrightarrow[n\to\infty]{} \|g - f^\ast\|_{L^2(D,\nu)}^2
-$
-$$
+$\frac{1}{n}\sum_{i=1}^{n} \left[ g(\nabla f(X_i)) + f(X_i) - \langle X_i,\nabla f(X_i)\rangle \right]^2 \xrightarrow[n\to\infty]{} \|g - f^\ast\|_{L^2(D,\nu)}^2$
+
 This provides a straightforward Monte‑Carlo certificate of $L^2$ error even when $f^\ast$ has no closed form.
 
 ---
@@ -152,13 +144,11 @@ This provides a straightforward Monte‑Carlo certificate of $L^2$ error even wh
 
 **Hamilton–Jacobi PDEs (Hopf formula):**
 
-$
-u(x,t) = \big(g^\ast + t\,H\big)^\ast(x).
-$
+$u(x,t) = \big(g^\ast + t H\big)^\ast(x).$
 
 DLT approximates the time‑parameterized dual $g^\ast+tH$ (or directly $(g^\ast+tH)^\ast$), and often outperforms residual‑minimizing PINNs in $L^2$ across $t$ and $d$.
 
-**Optimal transport / WGANs:** Learn convex potentials via a fast, direct conjugation primitive.
+**Optimal transport / WGANs:** Learn convex potentials, see here and here.
 
 **Symbolic regression (KANs):** Recover exact expressions for $f^\ast$ (e.g., quadratic, negative log/entropy) with near‑machine‑precision residuals in low‑$d$.
 
