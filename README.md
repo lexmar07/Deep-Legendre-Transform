@@ -5,7 +5,8 @@
 [![NeurIPS 2025](https://img.shields.io/badge/NeurIPS-2025-purple.svg)](https://neurips.cc/)
 
 > **A simple, scalable way to learn convex conjugates in high dimensions.**
-> DLT trains a neural network to approximate the convex conjugate $f^\ast $ of a differentiable convex function $ f $, using an *implicit Fenchel identity* that supplies exact training targets—no closed‑form $ f^* $ required.
+
+DLT trains a neural network to approximate the convex conjugate $f^\ast$ of a differentiable convex function $f$, using an *implicit Fenchel identity* that supplies exact training targets—no closed‑form $f^*$ required.
 
 ---
 
@@ -14,6 +15,7 @@
 * [Overview](#overview)
 * [Mathematical Primer](#mathematical-primer)
 * [Method (DLT) in One Look](#method-dlt-in-one-look)
+* [Approximate Inverse Sampling](#approximate-inverse-sampling)
 * [Certificates: A‑Posteriori Error Estimator](#certificates-a-posteriori-error-estimator)
 * [Applications](#applications)
 * [Results at a Glance](#results-at-a-glance)
@@ -29,95 +31,170 @@
 ## Overview
 
 **Deep Legendre Transform (DLT)** is a learning framework for computing convex conjugates in high dimensions.
-Classic grid methods for \(f^*(y) = \sup_{x\in C}{\langle x,y\rangle - f(x)}\) suffer from the curse of dimensionality; smoothing methods still require costly integration loops. DLT avoids both by training on **exact targets** derived from the *implicit* Legendre–Fenchel identity:
-\[
-f^*(\nabla f(x)) = \langle x, \nabla f(x)\rangle - f(x).
-\]
+Classic grid methods for
+$$f^\ast(y) = \sup_{x\in C}{\langle x,y\rangle - f(x)} $$
+
+suffer from the curse of dimensionality; smoothing methods still require costly integration loops. DLT avoids both by training on **exact targets** derived from the *implicit* Legendre–Fenchel identity:
+$$f^\ast(\nabla f(x)) = \langle x, \nabla f(x)\rangle - f(x).$$
 
 **Highlights**
 
-* **Scales to high‑D:** Works with MLPs/ResNets/ICNNs/KANs; demonstrated up to (d=200).
-* **Convex outputs (optional):** Use an ICNN to guarantee convexity of the learned \(g_\theta \approx f^*\).
-* **No closed‑form dual needed:** Targets come from (f) and (\nabla f) only.
-* **Built‑in validation:** An *unbiased* Monte‑Carlo estimator certifies \(L^2\) approximation error of \(g_\theta\) to \(f^*\).
+* **Scales to high‑D:** Works with MLPs / ResNets / ICNNs / KANs; demonstrated up to $d=200$.
+* **Convex outputs (optional):** Use an ICNN to guarantee convexity of the learned $g_\theta \approx f^*$.
+* **No closed‑form dual needed:** Targets come from $f$ and $\nabla f$ only.
+* **Built‑in validation:** A Monte‑Carlo estimator certifies $L^2$ approximation error of $g_\theta$ to $f^*$.
 * **Symbolic recovery:** With KANs, DLT can rediscover exact closed‑form conjugates in low dimension.
 
 ---
 
 ## Mathematical Primer
 
-* **Legendre–Fenchel transform:**
-  \[
-  f^*(y) = \sup_{x\in C} {\langle x,y\rangle - f(x)},\quad y\in\mathbb{R}^d.
-  \]
-* **Legendre (gradient) form (on (D=\nabla f(C))):**
-  \[
-  f^*(y)= \langle (\nabla f)^{-1}(y),, y\rangle - f\big((\nabla f)^{-1}(y)\big).
-  \]
-* **Implicit Fenchel identity:**
-  \[
-  f^*(\nabla f(x)) = \langle x, \nabla f(x)\rangle - f(x),\quad x\in C.
-  \]
+* **Legendre–Fenchel transform**
+  $$
+  f^*(y) = \sup_{x\in C}{\langle x,y\rangle - f(x)}, \quad y\in\mathbb{R}^d.
+  $$
+
+* **Legendre (gradient) form on $D=\nabla f(C)$**
+  $$
+  f^*(y) = \big\langle (\nabla f)^{-1}(y),, y\big\rangle
+
+  * f!\big((\nabla f)^{-1}(y)\big).
+    $$
+
+* **Implicit Fenchel identity**
+  $$
+  f^*(\nabla f(x)) = \langle x,\nabla f(x)\rangle - f(x), \quad x\in C.
+  $$
 
 ---
 
-## Method (DLT) 
+## Method (DLT) in One Look
 
-Train a network (g_\theta: D\to\mathbb{R}) (e.g., MLP/ResNet/ICNN/KAN) by minimizing:
-[
-\min_{\theta}\ \sum_{x\in\mathcal{X}*{\text{train}}}
-\big[g*\theta(\nabla f(x)) + f(x) - \langle x,\nabla f(x)\rangle\big]^2.
-]
+Train a network $g_\theta : D \to \mathbb{R}$ (e.g., MLP / ResNet / ICNN / KAN) by minimizing
+$$
+\min_{\theta}\ \mathbb{E}*{X\sim \mu}
+\Big[, g*\theta(\nabla f(X)) + f(X) - \langle X,\nabla f(X)\rangle ,\Big]^2,
+$$
+or empirically,
+$$
+\min_{\theta}\ \frac{1}{n}\sum_{i=1}^{n}
+\Big[, g_\theta(\nabla f(x_i)) + f(x_i) - \langle x_i,\nabla f(x_i)\rangle ,\Big]^2.
+$$
 
-**Sampling in gradient space.** When \(\nabla f\) *distorts* \(C\) heavily, learn a lightweight inverse \(\Psi_\vartheta\) of \(\nabla f\) to sample desired distributions directly on (D) (uniform, Gaussian, localized, etc.), then map back (y\mapsto x=h_\vartheta(y)) for training.
+**Sampling in gradient space.** When $\nabla f$ *distorts* $C$ heavily, you can sample directly on $D$ (uniform, Gaussian, localized, etc.) and map back to $C$ with an approximate inverse $h_\varphi \approx (\nabla f)^{-1}$; see [Approximate Inverse Sampling](#approximate-inverse-sampling).
 
-**Convexity.** Choose \(g_\theta\) as an **ICNN** to ensure the learned \(g_\theta\) is convex (helpful for downstream optimization/OT/control).
+**Convexity.** Choose $g_\theta$ as an **ICNN** to ensure the learned $g_\theta$ is convex (useful for downstream optimization/OT/control).
+
+---
+
+## Approximate Inverse Sampling
+
+When $Y=\nabla f(X)$ with $X\sim\mu$ is highly concentrated or poorly covers $D$, training on $Y$ may be imbalanced. **Approximate inverse sampling** fixes this by learning a map
+$$
+h_\varphi : D \to C \quad\text{with}\quad \nabla f\big(h_\varphi(y)\big) \approx y,
+$$
+so we can first sample $Y\sim \nu^\dagger$ (a *desired* distribution on $D$: uniform, Gaussian, stratified, etc.), set $X=h_\varphi(Y)$, and then train DLT on $(Y,X)$.
+
+**Objective.** Fit $h_\varphi$ with the inverse‑consistency loss
+$$
+\mathcal{L}*{\text{inv}}(\varphi)
+= \mathbb{E}*{Y\sim \nu^\dagger}
+\big|
+\nabla f\big(h_\varphi(Y)\big) - Y
+\big|_2^2
+
+* \lambda_{\text{C}}\ \mathbb{E}!\left[\mathrm{barrier}*C!\big(h*\varphi(Y)\big)\right]
+* \lambda_{\text{Lip}}\ \mathrm{penalty}*{\text{Lip}}(h*\varphi),
+  $$
+  where:
+
+- **Barrier / range constraint.** Penalize leaving $C$ (e.g., softplus of signed distance or box barriers).
+- **Lipschitz / monotonicity control.** Spectral normalization, gradient penalty, or contractive regularization for stability.
+  If $f$ is $m$‑strongly convex, then $(\nabla f)^{-1}$ is $1/m$‑Lipschitz; use this to set a target Lipschitz bound.
+
+**Using $h_\varphi$ in DLT.**
+
+1. Sample $Y \sim \nu^\dagger$ on $D$.
+2. Set $X = h_\varphi(Y)$.
+3. Form targets $T(Y) = \langle X, Y\rangle - f(X)$ and train $g_\theta(Y)$ to match $T(Y)$.
+
+**Optional refinements.**
+
+* **Importance reweighting:** If you need the DLT risk under another $\nu$, weight samples by $w(Y)=\tfrac{d\nu}{d\nu^\dagger}(Y)$.
+* **Cycle consistency (optional):** Train a small forward net $\phi_\psi \approx \nabla f$ and add
+  $|\phi_\psi(h_\varphi(Y)) - Y|*2^2 + |h*\varphi(\phi_\psi(X)) - X|_2^2$.
+* **Architectures for $h_\varphi$:**
+
+  * MLP with spectral normalization (simple, fast).
+  * Monotone/triangular flows (e.g., monotone splines per dimension) when $C$ is box‑shaped.
+  * i‑ResNets / coupling‑flow blocks if strict invertibility on $D$ is desired.
+
+**Minimal pseudocode (PyTorch‑style)**
+
+```python
+# 1) Learn approximate inverse h_phi
+for step in range(T_inv):
+    y = sample_from_nu_dagger(batch, D)     # desired coverage on D
+    x_hat = h_phi(y)
+    loss_inv = ((grad_f(x_hat) - y)**2).mean()
+    loss_inv += lambda_C * barrier_C(x_hat) + lambda_lip * lipschitz_penalty(h_phi)
+    update(phi, loss_inv)
+
+# 2) Train DLT using inverse-sampled pairs
+for step in range(T_dlt):
+    y = sample_from_nu_dagger(batch, D)
+    x = h_phi(y).detach()
+    target = (x * y).sum(dim=1, keepdim=True) - f(x)
+    loss = ((g_theta(y) - target)**2).mean()
+    update(theta, loss)
+```
 
 ---
 
 ## Certificates: A‑Posteriori Error Estimator
 
-Let (X_1,\dots,X_n) be i.i.d. from a distribution (\mu) on (C), with (\nu = \mu\circ(\nabla f)^{-1}) on (D). Then
-[
-\underbrace{\frac{1}{n}\sum_{i=1}^{n}\big[g(\nabla f(X_i)) + f(X_i) - \langle X_i,\nabla f(X_i)\rangle\big]^2}_{\text{Monte‑Carlo estimator}}
-\to \ |g-f^*|^2_{L^2(D,\nu)}.
-]
-This yields **unbiased** validation of (L^2) error even when (f^*) is not known in closed form.
+Let $X_1,\dots,X_n$ be i.i.d. from a distribution $\mu$ on $C$, with $\nu = \mu\circ(\nabla f)^{-1}$ on $D$. Then
+$$
+\frac{1}{n}\sum_{i=1}^{n}
+\Big[, g(\nabla f(X_i)) + f(X_i) - \langle X_i,\nabla f(X_i)\rangle ,\Big]^2
+;\xrightarrow[n\to\infty]{};
+|g - f^\ast|_{L^2(D,\nu)}^2.
+$$
+This provides a straightforward Monte‑Carlo certificate of $L^2$ error even when $f^*$ has no closed form.
 
 ---
 
 ## Applications
 
 * **Hamilton–Jacobi PDEs (Hopf formula):**
-  [
+  $$
   u(x,t) = \big(g^* + t,H\big)^*(x).
-  ]
-  DLT approximates the time‑parameterized dual ((g^*+tH)) or directly ((g^*+tH)^*), often outperforming residual‑minimizing PINNs in (L^2) accuracy across (t) and (d).
+  $$
+  DLT approximates the time‑parameterized dual $g^*+tH$ (or directly $(g^*+tH)^*$), and often outperforms residual‑minimizing PINNs in $L^2$ across $t$ and $d$.
 
 * **Optimal transport / WGANs:** Learn convex potentials via a fast, direct conjugation primitive.
 
-* **Symbolic regression (KANs):** Recover exact expressions for (f^*) (e.g., quadratic, negative log, negative entropy) with near‑machine precision residuals in 2D.
+* **Symbolic regression (KANs):** Recover exact expressions for $f^*$ (e.g., quadratic, negative log/entropy) with near‑machine‑precision residuals in low‑$d$.
 
 ---
 
 ## Results at a Glance
 
-**DLT vs. classical grid (Lucet LLT) at (N=10) grid points per dim (representative):**
+**DLT vs. classical grid (Lucet LLT) at $N=10$ grid points per dim (representative):**
 
-| Dim (d) | Classical (grid/FFT/LLT)       | DLT (ResNet/ICNN)                 |
-| ------: | ------------------------------ | --------------------------------- | 
-|     2–6 | Fast & accurate on fine grids  | Matches the error                 | 
-|    8–10 | Time/memory explode ((O(N^d))) | Trains in seconds–minutes         |
-|  20–200 | Infeasible                     | Trains; low RMSE with ResNet      | 
+| Dim $d$ | Classical (grid/FFT/LLT)               | DLT (ResNet/ICNN)         |
+| ------: | -------------------------------------- | ------------------------- |
+|     2–6 | Fast & accurate on fine grids          | Matches the error         |
+|    8–10 | Time/memory explode $\mathcal{O}(N^d)$ | Trains in seconds–minutes |
+|  20–200 | Infeasible                             | Trains; low RMSE          |
 
-
-**Architectures:** ResNet often gives the best approximation in high‑D; ICNN guarantees convexity (sometimes slightly higher error); KANs recover exact closed forms in 2D.
+**Architectures:** ResNet often gives the best approximation in high‑$d$; ICNN guarantees convexity (sometimes slightly higher error); KANs recover exact closed forms in 2D.
 
 ---
 
 ## Minimal Working Example (PyTorch)
 
-Below is a tiny end‑to‑end demo of DLT on a **quadratic** (f(x)=\tfrac12|x|_2^2) (so (f^*=f)). It shows the core training loop using the implicit identity—no closed‑form (f^*) needed.
+Below is a tiny end‑to‑end demo of DLT on a **quadratic** $f(x)=\tfrac12|x|_2^2$ (so $f^*=f$). It shows the core training loop using the implicit identity—no closed‑form $f^*$ needed.
 
 ```python
 # Minimal DLT demo (PyTorch) — quadratic example
@@ -173,7 +250,7 @@ with torch.no_grad():
 print(f"Certified RMSE on ∇f(C): {mse:.3e}")
 ```
 
-> **Note:** For general (f), replace `grad_f` with `torch.autograd.grad` on `f(x).sum()` (keeping `x.requires_grad_(True)`), or use your analytic gradient. For **convex** outputs, swap `g` for an **ICNN**.
+> **Note:** For general $f$, replace `grad_f` with `torch.autograd.grad` on `f(x).sum()` (keeping `x.requires_grad_(True)`), or use your analytic gradient. For **convex** outputs, swap `g` for an **ICNN**.
 
 ---
 
@@ -182,7 +259,7 @@ print(f"Certified RMSE on ∇f(C): {mse:.3e}")
 ```
 ├── main_part/          # Core implementation and experiment scripts
 ├── appendix/           # Supplementary experiments, figures, extended tables
-├── images/ images2/    # Figures used in README/paper
+├── images              # Figures used in paper
 ├── LICENSE             # Apache 2.0
 └── README.md
 ```
@@ -215,11 +292,9 @@ This project is licensed under the **Apache License 2.0**. See [LICENSE](LICENSE
 **Aleksey Minabutdinov** — [aminabutdinov@ethz.ch](mailto:aminabutdinov@ethz.ch) (ETH Zurich)
 **Patrick Cheridito** — [patrickc@ethz.ch](mailto:patrickc@ethz.ch) (ETH Zurich)
 
+---
+
+## Acknowledgments
+
 Swiss National Science Foundation — Grant No. **10003723**
-
-
-
-
-
-
 
