@@ -132,17 +132,27 @@ This provides a straightforward Monte‑Carlo certificate of $L^2$ error even wh
 
 ## Applications
 
+## Applications
+
 **Hamilton–Jacobi PDEs (Hopf formula):**
 
-$u(x,t) = \big(g^\ast + t H\big)^\ast(x).$
+```math
+u(x,t) = \big(g^\ast + t\,H\big)^\ast(x)
+```
 
 DLT approximates the time‑parameterized dual $g^\ast+tH$ (or directly $(g^\ast+tH)^\ast$), and often outperforms residual‑minimizing PINNs in $L^2$ across $t$ and $d$.
 
-**Optimal transport / WGANs:** Learn convex potentials, see here and here.
+**Optimal transport / WGANs:** Learn convex potentials, see [here](https://openreview.net/forum?id=TQ5WUwS_4ai) and [here](https://openreview.net/forum?id=bEoxzW_EXsa).
 
-**Symbolic regression (KANs):** Recover exact expressions for $f^\ast$ (e.g., quadratic, negative log/entropy) with near‑machine‑precision residuals in low‑$d$.
+**Symbolic regression (KANs):** Recover exact expressions for $f^\ast$ (e.g., quadratic, negative log/entropy) with near‑machine‑precision residuals in low-$d$.
 
----
+**Economics:** Derive indirect utility and profit functions.
+
+**Physics/Thermodynamics:** Switch between thermodynamic potentials by exchanging extensive variables (entropy, volume) for intensive conjugates (temperature, pressure).
+
+**Variational analysis:** Construct Moreau envelopes.
+
+**Convex optimization:** Compute convex potentials in optimal transport problems.
 
 ## Results at a Glance
 
