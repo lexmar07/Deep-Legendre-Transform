@@ -56,14 +56,12 @@ $$f^\ast(\nabla f(x)) = \langle x, \nabla f(x)\rangle - f(x).$$
 
 * **Legendre (gradient) form on $D=\nabla f(C)$**
   $$
-  f^*(y) = \big\langle (\nabla f)^{-1}(y),, y\big\rangle
-
-  * f!\big((\nabla f)^{-1}(y)\big).
-    $$
+  f^\ast(y) = \big\langle (\nabla f)^{-1}(y), y \big\rangle -  f\big((\nabla f)^{-1}(y)\big).
+  $$
 
 * **Implicit Fenchel identity**
   $$
-  f^*(\nabla f(x)) = \langle x,\nabla f(x)\rangle - f(x), \quad x\in C.
+  f^\ast(\nabla f(x)) = \langle x,\nabla f(x)\rangle - f(x), \quad x\in C.
   $$
 
 ---
@@ -72,8 +70,8 @@ $$f^\ast(\nabla f(x)) = \langle x, \nabla f(x)\rangle - f(x).$$
 
 Train a network $g_\theta : D \to \mathbb{R}$ (e.g., MLP / ResNet / ICNN / KAN) by minimizing
 $$
-\min_{\theta}\ \mathbb{E}*{X\sim \mu}
-\Big[, g*\theta(\nabla f(X)) + f(X) - \langle X,\nabla f(X)\rangle ,\Big]^2,
+\min_{\theta}\ \mathbb{E}_{X\sim \mu}
+\Big[ g^\ast \theta(\nabla f(X)) + f(X) - \langle X,\nabla f(X)\rangle \Big]^2,
 $$
 or empirically,
 $$
@@ -155,10 +153,7 @@ for step in range(T_dlt):
 
 Let $X_1,\dots,X_n$ be i.i.d. from a distribution $\mu$ on $C$, with $\nu = \mu\circ(\nabla f)^{-1}$ on $D$. Then
 $$
-\frac{1}{n}\sum_{i=1}^{n}
-\Big[, g(\nabla f(X_i)) + f(X_i) - \langle X_i,\nabla f(X_i)\rangle ,\Big]^2
-;\xrightarrow[n\to\infty]{};
-|g - f^\ast|_{L^2(D,\nu)}^2.
+\frac{1}{n}\sum_{i=1}^{n} \Big[, g(\nabla f(X_i)) + f(X_i) - \langle X_i,\nabla f(X_i)\rangle ,\Big]^2 \xrightarrow[n\to\infty]{} |g - f^\ast|_{L^2(D,\nu)}^2.
 $$
 This provides a straightforward Monte‑Carlo certificate of $L^2$ error even when $f^*$ has no closed form.
 
@@ -186,7 +181,7 @@ This provides a straightforward Monte‑Carlo certificate of $L^2$ error even wh
 | ------: | -------------------------------------- | ------------------------- |
 |     2–6 | Fast & accurate on fine grids          | Matches the error         |
 |    8–10 | Time/memory explode $\mathcal{O}(N^d)$ | Trains in seconds–minutes |
-|  20–200 | Infeasible                             | Trains; low RMSE          |
+|  20–200 | Infeasible                             | Can be trained to low RMSE|
 
 **Architectures:** ResNet often gives the best approximation in high‑$d$; ICNN guarantees convexity (sometimes slightly higher error); KANs recover exact closed forms in 2D.
 
