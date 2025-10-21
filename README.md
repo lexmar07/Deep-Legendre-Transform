@@ -5,7 +5,7 @@
 [![NeurIPS 2025](https://img.shields.io/badge/NeurIPS-2025-purple.svg)](https://neurips.cc/)
 
 > **A simple, scalable way to learn convex conjugates in high dimensions.**
-> DLT trains a neural network to approximate the convex conjugate $f^*$ of a differentiable convex function $(f$, using an *implicit Fenchel identity* that supplies exact training targets—no closed‑form $f^*$ required.
+> DLT trains a neural network to approximate the convex conjugate $ f^* $ of a differentiable convex function $ f $, using an *implicit Fenchel identity* that supplies exact training targets—no closed‑form $ f^* $ required.
 
 ---
 
