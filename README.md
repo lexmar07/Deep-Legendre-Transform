@@ -5,7 +5,7 @@
 [![NeurIPS 2025](https://img.shields.io/badge/NeurIPS-2025-purple.svg)](https://neurips.cc/)
 
 > **A simple, scalable way to learn convex conjugates in high dimensions.**
-> DLT trains a neural network to approximate the convex conjugate $ f^* $ of a differentiable convex function $ f $, using an *implicit Fenchel identity* that supplies exact training targets—no closed‑form $ f^* $ required.
+> DLT trains a neural network to approximate the convex conjugate $f^\ast $ of a differentiable convex function $ f $, using an *implicit Fenchel identity* that supplies exact training targets—no closed‑form $ f^* $ required.
 
 ---
 
@@ -23,13 +23,12 @@
 * [License](#license)
 * [Contact](#contact)
 * [Acknowledgments](#acknowledgments)
-* [FAQ](#faq)
 
 ---
 
 ## Overview
 
-**Deep Legendre Transform (DLT)** is a learning framework for computing convex conjugates in high dimension.
+**Deep Legendre Transform (DLT)** is a learning framework for computing convex conjugates in high dimensions.
 Classic grid methods for \(f^*(y) = \sup_{x\in C}{\langle x,y\rangle - f(x)}\) suffer from the curse of dimensionality; smoothing methods still require costly integration loops. DLT avoids both by training on **exact targets** derived from the *implicit* Legendre–Fenchel identity:
 \[
 f^*(\nabla f(x)) = \langle x, \nabla f(x)\rangle - f(x).
