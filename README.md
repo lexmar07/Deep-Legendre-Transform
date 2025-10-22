@@ -6,7 +6,7 @@
 
 > **A simple, scalable way to learn convex conjugates in high dimensions.**
 
-DLT trains a neural network to approximate the convex conjugate $f^\ast$ of a differentiable convex function $f$, using an *implicit Fenchel identity* that supplies exact training targets—no closed‑form $f^\ast$ required.
+DLT trains a neural network to approximate the convex conjugate $f^\ast$ of a differentiable convex function $f$, using an *implicit Fenchel identity*, which supplies exact training targets and allows a posteriori error estimation, no closed‑form $f^\ast$ required.
 
 ---
 
