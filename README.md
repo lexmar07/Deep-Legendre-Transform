@@ -132,7 +132,6 @@ This provides a straightforward Monte‑Carlo certificate of $L^2$ error even wh
 
 ## Applications
 
-## Applications
 
 **Hamilton–Jacobi PDEs (Hopf formula):**
 
