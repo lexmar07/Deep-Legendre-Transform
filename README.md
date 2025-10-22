@@ -107,7 +107,7 @@ for step in range(T_inv):
     y = sample_from_nu_dagger(batch, D)     # desired coverage on D
     x_hat = Psi_theta(y)
     loss_inv = ((grad_f(x_hat) - y)**2).mean()
-    loss_inv += lambda_C * barrier_C(x_hat) + lambda_lip * lipschitz_penalty(Psi_theta)
+    loss_inv += lambda_C * barrier_C(x_hat)
     update(theta_inv, loss_inv)
 
 # 2) Train DLT using inverse-sampled pairs
