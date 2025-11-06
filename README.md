@@ -160,7 +160,7 @@ DLT approximates the time‑parameterized dual $g^\ast+tH$ (or directly $(g^\ast
 | Dim $d$ | Classical (grid/FFT/LLT)               | DLT (ResNet/ICNN)         |
 | ------: | -------------------------------------- | ------------------------- |
 |     2–6 | Fast & accurate on fine grids          | Matches the error         |
-|    8–10 | Time/memory explode $\mathcal{O}(N^d)$ | Trains in seconds–minutes |
+|    8–10 | Time/memory explode $\mathcal{O}(d N^d)$ | Trains in seconds–minutes |
 |  20–200 | Infeasible                             | Can be trained to low RMSE|
 
 **Architectures:** ResNet often gives the best approximation in high‑$d$; ICNN guarantees convexity (sometimes slightly higher error); KANs recover exact closed forms in 2D.
